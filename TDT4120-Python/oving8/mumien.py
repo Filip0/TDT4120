@@ -2,10 +2,14 @@ from sys import stdin
 
 def beste_sti(nm, sans):
     # SKRIV DIN KODE HER
+    v = nm
     results = []
+    previous = []
     for x in range(nm):
         results[x] = 0
     print results
+    for vertex in v:
+        
     
     
 

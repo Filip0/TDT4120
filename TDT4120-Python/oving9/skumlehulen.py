@@ -1,43 +1,3 @@
-"""
-I denne oevingen faar du gitt en graf, et sett med startnoder, og et sett med sluttnoder. 
-Programmet ditt skal finne ut hvor mange stier det gaar an aa lage fra startnodene til sluttnoder 
-uten at disse krysser. En sti fra en startnode kan gaa til hvilken som helst sluttnode, 
-men forskjellige stier kan ikke moetes i samme sluttnode. For aa finne ut hvor mange stier 
-det kan gaa gjennom en graf, maa du bruke maks flyt. Siden du i dette problemet har mange 
-startnoder (sources) og mange sluttnoder (sinks), maa du lage en super-source med kant til 
-alle startnoder, og en super-sink med kant fra all sluttnodene.
-
-To stier som er innom samme node krysser. Det vil si at du maa tilordne en kapasitet til nodene. 
-Dette kan du gjoere ved aa splitte nodene. For hver node v, lager du nodene v1 og v2. 
-Saa lager du en kant fra v1 til v2. Hvis det gaar en kant fra u til v, lager du en kant fra u2 til v1, 
-og hvis det gaar en kant fra v til w, lager du en kant fra v2 til w1. 
-Da vil det ikke kunne gaa mer enn en flyt gjennom v. Sett bort fra dette oppfoerer v1 og v2 
-seg til sammen som v gjorde i den opprinnelige grafen.
-
-Foerste linje i input er antall noder, antall startnoder, og antall sluttnoder. 
-Saa kommer en linje med alle startnodene, og en linje med alle sluttnodene. 
-Deretter kommer en nabomatrise, hvor "1" betyr at det gaar en kant, og "0" betyr at det ikke gaar en kant. 
-Programmet ditt skal skrive ut maksimalt antall stier fra startnoder til sluttnoder uten at 
-noen av dem moetes i noen av nodene. 
-
-Input-eksempel
-
-6 2 2
-0 1
-4 5
-0 0 1 0 0 0
-0 0 0 1 0 0
-0 0 0 0 0 1
-0 0 0 0 1 1
-0 0 0 0 0 0
-0 0 0 0 0 0
-
-Tilhoerende output
-
-2
-
-"""
-
 from sys import stdin, stderr
 
 # kapasiteter er den opprinnelige kapasitetsmatrisen, som inneholder n x n elementer (hvor n er antall noder).
@@ -47,9 +7,35 @@ from sys import stdin, stderr
 def antallIsolerteStier(kapasiteter, startrom, utganger):
     # Du kan bruke metoden finnFlytsti for aa forenkle oppgaven.
     # SKRIV DIN KODE HER
-    print(kapasiteter)
-    print(startrom)
-    print(utganger)
+    n = len(kapasiteter)
+    
+    noder = [[0 for i in range(n*2+2)] for j in range(n*2+2)]
+    
+    for i in range(len(startrom)):
+        noder[0][startrom[i]*2+1] = 1
+        
+    for s in range(len(utganger)):
+        noder[utganger[s]*2+2][-1] = 1
+        
+    for i in range(len(kapasiteter)):
+        noder[i*2+1][i*2+2] = 1
+        for j in range(len(kapasiteter[i])):
+            if(kapasiteter[i][j] == 1):
+                noder[i*2+2][j*2+1] = 1
+                
+    temp = [[0 for i in range(n*2+2)] for j in range(n*2+2)]
+    t = finnFlytsti(0, n*2+1, temp, noder)
+    
+    counter = 0
+    while t:
+        counter += 1
+        for i in t:
+            if i != t[-1]:
+                temp[i][i+1] = 1
+        
+        t = finnFlytsti(0, n*2+1, temp, noder)
+                     
+    return counter
 
 # Finner en sti fra noden med indeks 'kilde' til noden med indeks 'sluk'
 # med ledig kapasitet i et flytnettverk med flyt F og kapasitet C.
